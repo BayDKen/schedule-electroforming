@@ -44,7 +44,19 @@ export default function LaporanPlanReal({
   sysInfo
 }) {
   // View mode: 'visual-matrix' (Gambar 1 adapted) or 'detailed-table' (Formal report)
-  const [viewMode, setViewMode] = useState('visual-matrix');
+  const [viewMode, setViewModeState] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') || 'visual-matrix';
+  });
+
+  const setViewMode = (mode) => {
+    setViewModeState(mode);
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('view', mode);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+  };
 
   // Pipeline tab filter: 'Lilin' (default matching Gambar 1) or 'Timah' or 'ALL'
   const [selectedPipeline, setSelectedPipeline] = useState('Lilin');

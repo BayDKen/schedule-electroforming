@@ -254,8 +254,8 @@ export default function SubprosesForm({
               >
                 <option value="">Pilih / scan kode sub proses</option>
                 {SUBPROSES_LIST.map(sp => (
-                  <option key={sp.id} value={sp.code}>
-                    {sp.code} - {sp.name} ({sp.jigLimit})
+                  <option key={sp.code} value={sp.code}>
+                    {sp.code} - {sp.name} ({sp.jigLimit || '-'})
                   </option>
                 ))}
               </select>

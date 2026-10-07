@@ -33,9 +33,21 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation & UI state
-  const [activeMenu, setActiveMenu] = useState('schedule-timeline'); // default view directly to Schedule Timeline page
+  // Navigation & UI state with URL query parameter support
+  const [activeMenu, setActiveMenuState] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('menu') || 'plan-vs-real';
+  });
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const setActiveMenu = (menu) => {
+    setActiveMenuState(menu);
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('menu', menu);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+  };
 
   // Core Data state
   const [machines, setMachines] = useState(INITIAL_MACHINES);
