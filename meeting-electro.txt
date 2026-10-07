@@ -1,0 +1,22 @@
+📋 Acara: Pembahasan Metode Produksi dan Kapasitas Mesin
+🕒 Waktu: 5 Oktober 2026 pukul 11:02 WIB
+👥 Peserta: __________
+
+Ringkasan: Diskusi membahas metode produksi nomor 34 terkait kapasitas mesin, waktu proses per item, dan penjadwalan orderan masuk dengan berbagai volume produk.
+
+Poin Utama:
+• Metode 34 menggunakan mesin dengan kapasitas berbeda-beda untuk setiap jenis barang
+• Volume produksi bervariasi dari 50 ml hingga 350 ml per unit, dengan total perhitungan mencapai 4950-5350 unit
+• Satu mesin hanya dapat memproses satu model/desain dalam satu waktu
+• Waktu proses per batch sekitar 25-30 jam, dengan waktu setup/penyesuaian mesin sekitar 5 menit antar produk
+• Tingkat utilisasi mesin mencapai 75%
+• Setiap proses membutuhkan pencocokan antara nomor model/desain dengan kapasitas mesin yang tersedia
+• Mesin tidak bisa dicampur penggunaannya untuk model yang berbeda dalam satu siklus produksi
+
+Keputusan:
+• Kapasitas mesin akan dihitung per mesin untuk memastikan penjadwalan yang akurat
+• Setiap mesin dialokasikan untuk satu model spesifik dalam satu periode produksi
+
+Item Tindakan:
+• Verifikasi data kapasitas mesin dan nomor desain untuk setiap proses — __________
+• Hitung ulang kapasitas produksi dengan mempertimbangkan waktu setup 5 menit — __________
