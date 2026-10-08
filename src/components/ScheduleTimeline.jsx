@@ -615,7 +615,7 @@ export default function ScheduleTimeline({
                   ? 'bg-emerald-600 text-white'
                   : 'bg-white text-slate-700 hover:bg-slate-50'
               }`}
-              title="Shift 1: 07:00 - 15:00 WIB"
+              title="Shift 1: 07:00 - 15:00 WIB (Istirahat 11:30 - 12:30)"
             >
               1 (07:00) {sysInfo?.shiftNum === 1 && '●'}
             </button>
@@ -623,10 +623,10 @@ export default function ScheduleTimeline({
               onClick={() => jumpToShift(2)}
               className={`px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs transition-colors ${
                 sysInfo?.shiftNum === 2
-                  ? 'bg-amber-500 text-white'
+                  ? 'bg-emerald-600 text-white'
                   : 'hover:bg-white text-slate-600'
               }`}
-              title="Shift 2: 15:00 - 23:00 WIB"
+              title="Shift 2: 15:00 - 23:00 WIB (Istirahat 17:30 - 18:30)"
             >
               2 (15:00) {sysInfo?.shiftNum === 2 && '●'}
             </button>
@@ -634,10 +634,10 @@ export default function ScheduleTimeline({
               onClick={() => jumpToShift(3)}
               className={`px-2 py-0.5 rounded text-[11px] font-bold shadow-2xs transition-colors ${
                 sysInfo?.shiftNum === 3
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-emerald-600 text-white'
                   : 'hover:bg-white text-slate-600'
               }`}
-              title="Shift 3: 23:00 - 07:00 WIB"
+              title="Shift 3: 23:00 - 07:00 WIB (Istirahat 02:00 - 03:00)"
             >
               3 (23:00) {sysInfo?.shiftNum === 3 && '●'}
             </button>
@@ -894,45 +894,103 @@ export default function ScheduleTimeline({
               <div className="flex" style={{ width: `${hoursCount * zoomLevel}px`, minWidth: `${hoursCount * zoomLevel}px` }}>
                 {daysArray.map((day) => (
                   <div key={`shifts-${day.dateFormatted}`} style={{ width: `${24 * zoomLevel}px` }} className="shrink-0 flex border-r-2 border-r-slate-400">
-                    {/* Shift 3 Early (00:00 - 07:00 = 7h) */}
+                    {/* Shift 3 Early (00:00 - 07:00 = 7h) with break 02:00 - 03:00 */}
                     <div 
-                      style={{ width: `${7 * zoomLevel}px` }} 
-                      className="shrink-0 border-r border-purple-200 bg-purple-50/70 text-purple-900 font-bold px-2 py-1 flex items-center justify-center text-center text-[10px] truncate"
-                      title="Shift 3 (Lanjutan Malam: 00:00 - 07:00 WIB)"
+                      style={{ width: `${2 * zoomLevel}px` }} 
+                      className="shrink-0 border-r border-emerald-200 bg-emerald-50/80 text-emerald-950 font-bold px-1 py-1 flex items-center justify-center text-center text-[10px] truncate"
+                      title="Shift 3 Kerja (00:00 - 02:00 WIB)"
                     >
-                      🌙 Shift 3 (00:00 - 07:00)
+                      🌙 S3 (00-02)
+                    </div>
+                    {/* Shift 3 Break: 02:00 - 03:00 (1h) */}
+                    <div 
+                      style={{ width: `${1 * zoomLevel}px` }} 
+                      className="shrink-0 border-r border-amber-400 bg-amber-200 text-amber-950 font-black px-0.5 py-1 flex items-center justify-center text-center text-[9px] truncate shadow-2xs"
+                      title="☕ Jam Istirahat Shift 3: 02:00 - 03:00 WIB"
+                    >
+                      ☕ Istirahat 02-03
+                    </div>
+                    {/* Shift 3 Post-break: 03:00 - 07:00 (4h) */}
+                    <div 
+                      style={{ width: `${4 * zoomLevel}px` }} 
+                      className="shrink-0 border-r-2 border-emerald-400 bg-emerald-50/80 text-emerald-950 font-bold px-1 py-1 flex items-center justify-center text-center text-[10px] truncate"
+                      title="Shift 3 Kerja (03:00 - 07:00 WIB)"
+                    >
+                      🌙 Shift 3 (03:00 - 07:00)
                     </div>
 
-                    {/* Shift 1 (07:00 - 15:00 = 8h) */}
+                    {/* Shift 1 (07:00 - 15:00 = 8h) with break 11:30 - 12:30 */}
+                    {/* Shift 1 Pre-break: 07:00 - 11:30 (4.5h) */}
                     <div 
-                      style={{ width: `${8 * zoomLevel}px` }} 
-                      className={`shrink-0 border-r border-emerald-300 font-black px-2 py-1 flex items-center justify-center text-center text-[10px] truncate ${
+                      style={{ width: `${4.5 * zoomLevel}px` }} 
+                      className={`shrink-0 border-r border-emerald-300 font-black px-1.5 py-1 flex items-center justify-center text-center text-[10px] truncate ${
                         day.isToday && sysInfo?.shiftNum === 1
+                          ? 'bg-emerald-200/90 text-emerald-950'
+                          : 'bg-emerald-100/70 text-emerald-900'
+                      }`}
+                      title="Shift 1 Kerja (Pagi: 07:00 - 11:30 WIB)"
+                    >
+                      ☀️ Shift 1 (07:00 - 11:30)
+                    </div>
+                    {/* Shift 1 Break: 11:30 - 12:30 (1h) */}
+                    <div 
+                      style={{ width: `${1 * zoomLevel}px` }} 
+                      className="shrink-0 border-r border-amber-400 bg-amber-300 text-amber-950 font-black px-0.5 py-1 flex items-center justify-center text-center text-[9px] truncate shadow-inner"
+                      title="☕ Jam Istirahat Shift 1: 11:30 - 12:30 WIB"
+                    >
+                      ☕ 11:30-12:30 Istirahat
+                    </div>
+                    {/* Shift 1 Post-break: 12:30 - 15:00 (2.5h) */}
+                    <div 
+                      style={{ width: `${2.5 * zoomLevel}px` }} 
+                      className={`shrink-0 border-r-2 border-emerald-400 font-black px-1 py-1 flex items-center justify-center text-center text-[10px] truncate ${
+                        day.isToday && sysInfo?.shiftNum === 1
+                          ? 'bg-emerald-200/90 text-emerald-950 ring-2 ring-emerald-500'
+                          : 'bg-emerald-100/70 text-emerald-900'
+                      }`}
+                      title="Shift 1 Kerja (12:30 - 15:00 WIB)"
+                    >
+                      ☀️ S1 (12:30 - 15:00) {day.isToday && sysInfo?.shiftNum === 1 && '● LIVE'}
+                    </div>
+
+                    {/* Shift 2 (15:00 - 23:00 = 8h) with break 17:30 - 18:30 */}
+                    {/* Shift 2 Pre-break: 15:00 - 17:30 (2.5h) */}
+                    <div 
+                      style={{ width: `${2.5 * zoomLevel}px` }} 
+                      className={`shrink-0 border-r border-emerald-300 font-black px-1 py-1 flex items-center justify-center text-center text-[10px] truncate ${
+                        day.isToday && sysInfo?.shiftNum === 2
+                          ? 'bg-emerald-200/90 text-emerald-950'
+                          : 'bg-emerald-50 text-emerald-900'
+                      }`}
+                      title="Shift 2 Kerja (Sore: 15:00 - 17:30 WIB)"
+                    >
+                      ⛅ Shift 2 (15:00 - 17:30)
+                    </div>
+                    {/* Shift 2 Break: 17:30 - 18:30 (1h) */}
+                    <div 
+                      style={{ width: `${1 * zoomLevel}px` }} 
+                      className="shrink-0 border-r border-amber-400 bg-amber-300 text-amber-950 font-black px-0.5 py-1 flex items-center justify-center text-center text-[9px] truncate shadow-inner"
+                      title="☕ Jam Istirahat Shift 2: 17:30 - 18:30 WIB"
+                    >
+                      ☕ 17:30-18:30 Istirahat
+                    </div>
+                    {/* Shift 2 Post-break: 18:30 - 23:00 (4.5h) */}
+                    <div 
+                      style={{ width: `${4.5 * zoomLevel}px` }} 
+                      className={`shrink-0 border-r-2 border-emerald-400 font-black px-1.5 py-1 flex items-center justify-center text-center text-[10px] truncate ${
+                        day.isToday && sysInfo?.shiftNum === 2
                           ? 'bg-emerald-200/90 text-emerald-950 ring-2 ring-emerald-500'
                           : 'bg-emerald-50 text-emerald-900'
                       }`}
-                      title="Shift 1 (Pagi: 07:00 - 15:00 WIB)"
+                      title="Shift 2 Kerja (18:30 - 23:00 WIB)"
                     >
-                      ☀️ Shift 1 (07:00 - 15:00 WIB) {day.isToday && sysInfo?.shiftNum === 1 && '● LIVE'}
-                    </div>
-
-                    {/* Shift 2 (15:00 - 23:00 = 8h) */}
-                    <div 
-                      style={{ width: `${8 * zoomLevel}px` }} 
-                      className={`shrink-0 border-r border-amber-300 font-black px-2 py-1 flex items-center justify-center text-center text-[10px] truncate ${
-                        day.isToday && sysInfo?.shiftNum === 2
-                          ? 'bg-amber-200/90 text-amber-950 ring-2 ring-amber-500'
-                          : 'bg-amber-50 text-amber-900'
-                      }`}
-                      title="Shift 2 (Sore: 15:00 - 23:00 WIB)"
-                    >
-                      ⛅ Shift 2 (15:00 - 23:00 WIB) {day.isToday && sysInfo?.shiftNum === 2 && '● LIVE'}
+                      ⛅ Shift 2 (18:30 - 23:00) {day.isToday && sysInfo?.shiftNum === 2 && '● LIVE'}
                     </div>
 
                     {/* Shift 3 Late (23:00 - 24:00 = 1h) */}
                     <div 
                       style={{ width: `${1 * zoomLevel}px` }} 
-                      className="shrink-0 bg-purple-50/70 text-purple-900 font-bold px-1 py-1 flex items-center justify-center text-center text-[9px] truncate"
+                      className="shrink-0 bg-emerald-50/70 text-emerald-950 font-bold px-1 py-1 flex items-center justify-center text-center text-[9px] truncate"
                       title="Shift 3 (Malam: 23:00 - 07:00 WIB)"
                     >
                       🌙 S3
@@ -981,28 +1039,123 @@ export default function ScheduleTimeline({
               </div>
             </div>
 
-            {/* TIER 4: ACTIVE SHIFT & TIME TRACK (Pink Bar matching Gambar 2) */}
-            <div className="flex bg-pink-50/80 border-b border-pink-200">
-              <div className="w-72 shrink-0 border-r border-slate-300 px-3 py-1 text-[11px] font-black text-pink-900 sticky left-0 z-40 bg-pink-100 flex items-center justify-between">
+            {/* TIER 4: ACTIVE SHIFT & TIME TRACK (Green / Emerald Bar with Break Times) */}
+            <div className="flex bg-emerald-50/70 border-b border-emerald-200">
+              <div className="w-72 shrink-0 border-r border-slate-300 px-3 py-1 text-[11px] font-black text-emerald-950 sticky left-0 z-40 bg-emerald-100 flex items-center justify-between shadow-2xs">
                 <div className="flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-pink-600 animate-ping"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
                   <span>Shift Aktif (Live)</span>
                 </div>
-                <span className="text-[9px] px-1.5 py-0.2 rounded bg-pink-200 text-pink-950 font-black">
-                  Shift {sysInfo?.shiftNum || 1}
-                </span>
+                <div className="flex items-center space-x-1">
+                  {sysInfo?.isBreakTime && (
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-black animate-pulse shadow-2xs">
+                      ☕ Istirahat
+                    </span>
+                  )}
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-950 font-black border border-emerald-400">
+                    Shift {sysInfo?.shiftNum || 1}
+                  </span>
+                </div>
               </div>
               
-              <div className="relative h-6 bg-pink-50/40" style={{ width: `${hoursCount * zoomLevel}px`, minWidth: `${hoursCount * zoomLevel}px` }}>
-                {/* Active Shift Bar */}
+              <div className="relative h-7 bg-emerald-50/30" style={{ width: `${hoursCount * zoomLevel}px`, minWidth: `${hoursCount * zoomLevel}px` }}>
+                {/* Active Shift Bar (Warna Hijau / Emerald dengan Jam Istirahat di tengah) */}
                 <div 
-                  className="absolute top-0.5 bottom-0.5 bg-pink-300 text-[10px] font-black text-pink-950 px-2.5 flex items-center rounded border border-pink-400 shadow-2xs"
+                  className="absolute top-0.5 bottom-0.5 bg-emerald-200/90 text-[10px] font-black text-emerald-950 rounded border-2 border-emerald-600 shadow-xs flex overflow-hidden"
                   style={{
                     left: `${(Math.max(0, todayDayIndex) * 24 + Math.max(0, sysInfo?.startHourInDay ?? 7)) * zoomLevel}px`,
                     width: `${(sysInfo?.durationHours ?? 8) * zoomLevel}px`
                   }}
                 >
-                  Shift {sysInfo?.shiftNum || 1} ({sysInfo?.timeRange || '07:00 - 15:00 WIB'}) — Waktu Kerja Aktif
+                  {/* Shift 1 (07:00 - 15:00): Istirahat 11:30 - 12:30 */}
+                  {sysInfo?.shiftNum === 1 && (
+                    <>
+                      {/* Kerja Sesi 1: 07:00 - 11:30 (4.5 jam) */}
+                      <div 
+                        style={{ width: `${4.5 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center border-r border-emerald-500 truncate"
+                        title="Waktu Kerja Shift 1 Sesi Pagi (07:00 - 11:30 WIB)"
+                      >
+                        ☀️ Shift 1 Kerja (07:00 - 11:30)
+                      </div>
+                      {/* Jam Istirahat: 11:30 - 12:30 (1.0 jam) */}
+                      <div 
+                        style={{ width: `${1.0 * zoomLevel}px` }} 
+                        className="h-full bg-amber-300 text-amber-950 px-1 flex items-center justify-center font-black border-r border-amber-500 shadow-inner text-[9px] truncate"
+                        title="☕ Jam Istirahat Shift 1: 11:30 - 12:30 WIB"
+                      >
+                        ☕ Istirahat 11:30-12:30
+                      </div>
+                      {/* Kerja Sesi 2: 12:30 - 15:00 (2.5 jam) */}
+                      <div 
+                        style={{ width: `${2.5 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center truncate"
+                        title="Waktu Kerja Shift 1 Sesi Siang (12:30 - 15:00 WIB)"
+                      >
+                        Kerja (12:30 - 15:00)
+                      </div>
+                    </>
+                  )}
+
+                  {/* Shift 2 (15:00 - 23:00): Istirahat 17:30 - 18:30 */}
+                  {sysInfo?.shiftNum === 2 && (
+                    <>
+                      {/* Kerja Sesi 1: 15:00 - 17:30 (2.5 jam) */}
+                      <div 
+                        style={{ width: `${2.5 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center border-r border-emerald-500 truncate"
+                        title="Waktu Kerja Shift 2 Sesi Sore (15:00 - 17:30 WIB)"
+                      >
+                        ⛅ Shift 2 Kerja (15:00 - 17:30)
+                      </div>
+                      {/* Jam Istirahat: 17:30 - 18:30 (1.0 jam) */}
+                      <div 
+                        style={{ width: `${1.0 * zoomLevel}px` }} 
+                        className="h-full bg-amber-300 text-amber-950 px-1 flex items-center justify-center font-black border-r border-amber-500 shadow-inner text-[9px] truncate"
+                        title="☕ Jam Istirahat Shift 2: 17:30 - 18:30 WIB"
+                      >
+                        ☕ Istirahat 17:30-18:30
+                      </div>
+                      {/* Kerja Sesi 2: 18:30 - 23:00 (4.5 jam) */}
+                      <div 
+                        style={{ width: `${4.5 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center truncate"
+                        title="Waktu Kerja Shift 2 Sesi Malam (18:30 - 23:00 WIB)"
+                      >
+                        Kerja (18:30 - 23:00)
+                      </div>
+                    </>
+                  )}
+
+                  {/* Shift 3 (23:00 - 07:00): Istirahat 02:00 - 03:00 */}
+                  {sysInfo?.shiftNum === 3 && (
+                    <>
+                      {/* Kerja Sesi 1: 23:00 - 02:00 (3.0 jam) */}
+                      <div 
+                        style={{ width: `${3.0 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center border-r border-emerald-500 truncate"
+                        title="Waktu Kerja Shift 3 Sesi Malam (23:00 - 02:00 WIB)"
+                      >
+                        🌙 Shift 3 Kerja (23:00 - 02:00)
+                      </div>
+                      {/* Jam Istirahat: 02:00 - 03:00 (1.0 jam) */}
+                      <div 
+                        style={{ width: `${1.0 * zoomLevel}px` }} 
+                        className="h-full bg-amber-300 text-amber-950 px-1 flex items-center justify-center font-black border-r border-amber-500 shadow-inner text-[9px] truncate"
+                        title="☕ Jam Istirahat Shift 3: 02:00 - 03:00 WIB"
+                      >
+                        ☕ Istirahat 02-03
+                      </div>
+                      {/* Kerja Sesi 2: 03:00 - 07:00 (4.0 jam) */}
+                      <div 
+                        style={{ width: `${4.0 * zoomLevel}px` }} 
+                        className="h-full bg-emerald-300/80 px-2 flex items-center truncate"
+                        title="Waktu Kerja Shift 3 Sesi Subuh (03:00 - 07:00 WIB)"
+                      >
+                        Kerja (03:00 - 07:00)
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* LIVE Time indicator needle */}

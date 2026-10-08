@@ -34,8 +34,13 @@ export default function Header({
               <span>{currentDateStr || 'Rabu, 07 Okt 2026'}</span>
             </span>
             <span className="text-slate-300 hidden sm:inline">|</span>
-            <span className={`hidden sm:inline px-2.5 py-0.5 rounded-full font-bold text-[11px] transition-colors border ${activeShift?.badgeColor || 'bg-emerald-100 text-emerald-800 border-emerald-200'}`}>
-              Shift {activeShift?.shiftNum || 1} ({activeShift?.timeRange || '07:00 - 15:00 WIB'})
+            <span className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold text-[11px] transition-colors border ${activeShift?.badgeColor || 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
+              <span>Shift {activeShift?.shiftNum || 1} ({activeShift?.timeRange || '07:00 - 15:00 WIB'})</span>
+              {activeShift?.breakSchedule && (
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold border ${activeShift?.isBreakTime ? 'bg-amber-400 text-amber-950 border-amber-500 animate-pulse' : 'bg-emerald-200/80 text-emerald-900 border-emerald-300'}`}>
+                  ☕ Istirahat: {activeShift?.breakSchedule?.shortDisplay}
+                </span>
+              )}
             </span>
           </div>
         </div>
