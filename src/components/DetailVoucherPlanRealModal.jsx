@@ -31,29 +31,25 @@ export default function DetailVoucherPlanRealModal({
   const actualIndex = processList.findIndex(p => p.code === voucher.actualStage);
   const plannedIndex = processList.findIndex(p => p.code === voucher.plannedStage);
 
-  // Status styling colors
-  const statusColors = {
-    OVERDUE: {
-      badge: 'bg-rose-100 text-rose-700 border-rose-300',
-      border: 'border-rose-500',
-      headerBg: 'from-rose-900 to-rose-700',
-      icon: <AlertTriangle className="w-4 h-4 text-rose-500" />
-    },
-    'ON PLAN': {
-      badge: 'bg-emerald-100 text-emerald-700 border-emerald-300',
-      border: 'border-emerald-500',
-      headerBg: 'from-emerald-900 to-teal-800',
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-    },
-    'ON TRACK': {
-      badge: 'bg-blue-100 text-blue-700 border-blue-300',
-      border: 'border-blue-500',
-      headerBg: 'from-[#0a3866] to-[#145388]',
-      icon: <Activity className="w-4 h-4 text-blue-400" />
-    }
-  };
+  // Status styling colors: Strictly Green (Terealisasi) and Yellow (Sedang Di-Schedule)
+  const isRealized = voucher.indicatorColor === 'green' || voucher.status === 'REALIZED';
+  const isPastTarget = voucher.scheduleState === 'PAST_TARGET' || voucher.isPastTarget || (voucher.delayHours && voucher.delayHours > 0);
 
-  const currentTheme = statusColors[voucher.condition] || statusColors['ON TRACK'];
+  const currentTheme = isRealized
+    ? {
+        badge: 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold',
+        border: 'border-emerald-500',
+        headerBg: 'from-emerald-800 to-teal-800',
+        icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+        statusTitle: '🟢 Terealisasi (Selesai)'
+      }
+    : {
+        badge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+        border: 'border-amber-500',
+        headerBg: 'from-[#b45309] to-[#d97706]',
+        icon: <Clock className="w-4 h-4 text-amber-300" />,
+        statusTitle: isPastTarget ? '🟡 Sedang Di-Schedule (Melewati Target Planning)' : '🟡 Sedang Di-Schedule (Dalam Target)'
+      };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
@@ -73,8 +69,8 @@ export default function DetailVoucherPlanRealModal({
                 <span className="text-white font-bold text-sm">
                   {voucher.modelCode}
                 </span>
-                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${currentTheme.badge}`}>
-                  {voucher.condition}
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${currentTheme.badge}`}>
+                  {currentTheme.statusTitle}
                 </span>
                 <span className="text-[10px] font-semibold bg-white/20 text-white px-2 py-0.5 rounded-full">
                   Jalur {voucher.materialType}
@@ -136,21 +132,21 @@ export default function DetailVoucherPlanRealModal({
                 Posisi: Plan vs Real
               </span>
               <div className="flex items-center space-x-1 font-bold text-slate-800">
-                <span className="text-blue-700">{voucher.actualStage} (Real)</span>
+                <span className="text-amber-800">{voucher.actualStage} (Real)</span>
                 <ArrowRight className="w-3 h-3 text-slate-400" />
-                <span className="text-indigo-700">{voucher.plannedStage} (Plan)</span>
+                <span className="text-blue-800">{voucher.plannedStage} (Plan)</span>
               </div>
-              <p className={`text-[10px] font-bold mt-1 ${voucher.condition === 'OVERDUE' ? 'text-rose-600' : 'text-emerald-600'}`}>
-                {voucher.condition === 'OVERDUE' ? 'Tertinggal Subproses' : 'Tepat Pada Jalur'}
+              <p className={`text-[10px] font-bold mt-1 ${isRealized ? 'text-emerald-700' : (isPastTarget ? 'text-amber-700' : 'text-slate-600')}`}>
+                {isRealized ? 'Selesai Sesuai Rencana' : (isPastTarget ? 'Melewati Target Planning' : 'Dalam Target Rencana')}
               </p>
             </div>
 
             <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
-                Deviasi Waktu (Variance)
+                Deviasi Waktu
               </span>
               <div className="text-base font-black text-slate-800">
-                {voucher.delayText || 'Tepat Waktu'}
+                {voucher.timingText || voucher.delayText || 'Tepat Waktu'}
               </div>
               <p className="text-[10px] text-slate-500 truncate mt-1">
                 PIC: {voucher.operator || 'Operator Tim'}
@@ -161,14 +157,14 @@ export default function DetailVoucherPlanRealModal({
           {/* CATATAN KONDISI LAPANGAN */}
           {voucher.reason && (
             <div className={`p-3.5 rounded-xl border ${
-              voucher.condition === 'OVERDUE' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-blue-50/70 border-blue-200 text-blue-900'
+              isRealized ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-amber-50/70 border-amber-200 text-amber-950'
             }`}>
               <div className="flex items-center space-x-2 font-bold mb-1">
                 {currentTheme.icon}
                 <span>Status & Analisis Kondisi di Lapangan:</span>
               </div>
               <p className="text-xs leading-relaxed">
-                {voucher.reason}. Mesin yang bertugas saat ini: <strong>{voucher.machine || '-'}</strong> oleh operator <strong>{voucher.operator || '-'}</strong>.
+                {voucher.reason}. Mesin: <strong>{voucher.machine || '-'}</strong> • Operator: <strong>{voucher.operator || '-'}</strong>.
               </p>
             </div>
           )}
@@ -208,18 +204,21 @@ export default function DetailVoucherPlanRealModal({
 
                     if (isPassed) {
                       stepStatus = 'Selesai';
-                      stepStatusColor = 'bg-emerald-100 text-emerald-700 font-bold';
+                      stepStatusColor = 'bg-emerald-100 text-emerald-800 font-bold';
                     } else if (isCurrent) {
-                      if (voucher.condition === 'OVERDUE') {
-                        stepStatus = 'Overdue (Aktif)';
-                        stepStatusColor = 'bg-rose-100 text-rose-700 font-black border border-rose-300 animate-pulse';
+                      if (isRealized) {
+                        stepStatus = 'Terealisasi';
+                        stepStatusColor = 'bg-emerald-100 text-emerald-800 font-black border border-emerald-300';
+                      } else if (isPastTarget) {
+                        stepStatus = 'Melewati Target';
+                        stepStatusColor = 'bg-amber-100 text-amber-900 font-bold border border-amber-300';
                       } else {
-                        stepStatus = 'Sedang Berjalan';
-                        stepStatusColor = 'bg-blue-100 text-blue-700 font-bold border border-blue-300';
+                        stepStatus = 'Sedang Di-Schedule';
+                        stepStatusColor = 'bg-amber-100 text-amber-900 font-bold border border-amber-300';
                       }
                     } else if (isTargetPlan && isFuture) {
-                      stepStatus = 'Target Plan (Tertunda)';
-                      stepStatusColor = 'bg-amber-100 text-amber-800 font-bold border border-amber-300';
+                      stepStatus = 'Target Planning';
+                      stepStatusColor = 'bg-blue-50 text-blue-800 font-bold border border-blue-200 border-dashed';
                     }
 
                     return (

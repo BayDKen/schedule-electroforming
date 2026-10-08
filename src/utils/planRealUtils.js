@@ -5,33 +5,33 @@ import { LILIN_PROCESSES, TIMAH_PROCESSES } from '../data/initialData';
 
 // Columns for Lilin visual board (matching Gambar 1)
 export const LILIN_VISUAL_COLUMNS = [
-  { code: 'CEL', label: 'CEL', subLabel: 'CETAK LILIN', name: 'Cetak Lilin', color: 'amber' },
+  { code: 'CEL', label: 'CEL', subLabel: 'Cetak Lilin', name: 'Cetak Lilin', color: 'amber' },
   { code: 'SOL', label: 'SOL', subLabel: 'Silver Oil', name: 'Silver Oil', color: 'slate' },
-  { code: 'ST1', label: 'ST1', subLabel: 'Tembaga Asam 1', name: 'Tembaga Asam 1', color: 'orange' },
-  { code: 'EFL', label: 'EFL', subLabel: 'ELEKTROFORMING LILIN', name: 'Elektroforming Lilin', color: 'blue' },
+  { code: 'ST1', label: 'ST1', subLabel: 'Tembaga Asam', name: 'Tembaga Asam 1', color: 'orange' },
+  { code: 'EFL', label: 'EFL', subLabel: 'Electroforming', name: 'Elektroforming Lilin', color: 'blue' },
   { code: 'BOR', label: 'BOR', subLabel: 'Bor', name: 'Bor Pelubangan', color: 'teal' },
   { code: 'HL1', label: 'HL1', subLabel: 'Hollowing 1', name: 'Hollowing 1', color: 'violet' },
   { code: 'ANN', label: 'ANN', subLabel: 'Annealing', name: 'Annealing', color: 'rose' },
   { code: 'HL2', label: 'HL2', subLabel: 'Hollowing 2', name: 'Hollowing 2', color: 'purple' },
-  { code: 'TKD', label: 'TKD', subLabel: 'Tunggu Kadar', name: 'Test Kadar Gold', color: 'emerald' },
+  { code: 'TKD', label: 'TKD', subLabel: 'Test Kadar', name: 'Test Kadar Gold', color: 'emerald' },
   { code: 'BJD', label: 'BJD', subLabel: 'Barang Jadi', name: 'Barang Jadi & Finishing', color: 'cyan' }
 ];
 
 // Columns for Timah visual board
 export const TIMAH_VISUAL_COLUMNS = [
-  { code: 'CET', label: 'CET', subLabel: 'CETAK TIMAH', name: 'Cetak Timah', color: 'slate' },
+  { code: 'CET', label: 'CET', subLabel: 'Cetak Timah', name: 'Cetak Timah', color: 'slate' },
   { code: 'AMP', label: 'AMP', subLabel: 'Amplas', name: 'Amplas Permukaan', color: 'zinc' },
   { code: 'GLD', label: 'GLD', subLabel: 'Glondong', name: 'Glondong Tumbler', color: 'stone' },
   { code: 'ULR', label: 'ULR', subLabel: 'Ulur', name: 'Ulur Kawat', color: 'orange' },
   { code: 'STB', label: 'STB', subLabel: 'Setor Bersih', name: 'Setor Bersih Bensin', color: 'amber' },
-  { code: 'ST1', label: 'ST1', subLabel: 'Jigging Timah', name: 'Jigging Timah ST1', color: 'indigo' },
-  { code: 'EFT', label: 'EFT', subLabel: 'ELEKTROFORMING TIMAH', name: 'Elektroforming Timah', color: 'blue' },
+  { code: 'ST1', label: 'ST1', subLabel: 'Jigging', name: 'Jigging Timah ST1', color: 'indigo' },
+  { code: 'EFT', label: 'EFT', subLabel: 'Electroforming', name: 'Elektroforming Timah', color: 'blue' },
   { code: 'ST2', label: 'ST2', subLabel: 'Bongkar Jig', name: 'Pelepasan Jig ST2', color: 'sky' },
   { code: 'BOR', label: 'BOR', subLabel: 'Bor', name: 'Bor Pelubangan', color: 'teal' },
   { code: 'OVN', label: 'OVN', subLabel: 'Oven Timah', name: 'Oven Melting Timah', color: 'red' },
   { code: 'HL1', label: 'HL1', subLabel: 'Hollowing 1', name: 'Hollowing 1', color: 'violet' },
   { code: 'ANN', label: 'ANN', subLabel: 'Annealing', name: 'Annealing', color: 'rose' },
-  { code: 'TKD', label: 'TKD', subLabel: 'Tunggu Kadar', name: 'Test Kadar Gold', color: 'emerald' },
+  { code: 'TKD', label: 'TKD', subLabel: 'Test Kadar', name: 'Test Kadar Gold', color: 'emerald' },
   { code: 'BJD', label: 'BJD', subLabel: 'Barang Jadi', name: 'Barang Jadi & Finishing', color: 'cyan' }
 ];
 
@@ -880,12 +880,54 @@ export const REALISTIC_FACTORY_VOUCHERS = [
 // - 4 in ST1
 // - 4 in HL2
 // Total = 81 vouchers!
+// Normalizer helper: Ensures each voucher has strictly 2 indicator colors (green / yellow)
+// and clear tracking of whether it is already realized or in-schedule (with past target detection)
+export function normalizeFactoryVoucher(v) {
+  // Finished stages or explicitly completed
+  const isFinishedStage = v.actualStage === 'BJD' || v.actualStage === 'TKD' || v.status === 'REALIZED';
+  
+  const status = isFinishedStage ? 'REALIZED' : 'SCHEDULED';
+  const indicatorColor = isFinishedStage ? 'green' : 'yellow';
+
+  let scheduleState = 'ON_TARGET';
+  let timingText = 'Dalam Target Rencana';
+
+  if (isFinishedStage) {
+    scheduleState = 'SELESAI';
+    timingText = 'Selesai Tepat Waktu';
+  } else if ((v.delayHours && v.delayHours > 0) || (v.plannedStage && v.plannedStage !== v.actualStage) || v.condition === 'OVERDUE') {
+    scheduleState = 'PAST_TARGET';
+    const delay = v.delayHours || 12.0;
+    timingText = `Seharusnya Selesai (Lewat ${delay} Jam)`;
+  } else {
+    scheduleState = 'ON_TARGET';
+    timingText = `Dalam Target (Target ${v.plannedFinishHours || 'Hari Ini'})`;
+  }
+
+  return {
+    ...v,
+    status,
+    indicatorColor,
+    scheduleState,
+    statusLabel: isFinishedStage ? 'Terealisasi' : 'Sedang Di-Schedule',
+    timingText,
+    isPastTarget: scheduleState === 'PAST_TARGET'
+  };
+}
+
+// Helper to generate full realistic factory vouchers (81 vouchers for Lilin matching factory baseline)
 export function getCompleteFactoryVouchers() {
-  const existing = [...REALISTIC_FACTORY_VOUCHERS];
+  const existing = REALISTIC_FACTORY_VOUCHERS.map((v, idx) => {
+    // Make specific vouchers finished/realized to have realistic distribution
+    const isRealized = v.actualStage === 'BJD' || v.actualStage === 'TKD' || idx % 4 === 0;
+    return normalizeFactoryVoucher({
+      ...v,
+      status: isRealized ? 'REALIZED' : 'SCHEDULED'
+    });
+  });
+
   const celExisting = existing.filter(v => v.materialType === 'Lilin' && v.actualStage === 'CEL');
   const solExisting = existing.filter(v => v.materialType === 'Lilin' && v.actualStage === 'SOL');
-  const st1Existing = existing.filter(v => v.materialType === 'Lilin' && v.actualStage === 'ST1');
-  const hl2Existing = existing.filter(v => v.materialType === 'Lilin' && v.actualStage === 'HL2');
 
   const generated = [...existing];
 
@@ -895,7 +937,9 @@ export function getCompleteFactoryVouchers() {
   for (let i = 1; i <= celNeeded; i++) {
     const vNum = 70 + i;
     const isLate = i % 2 === 0;
-    generated.push({
+    const isCompletedBatch = !isLate && i % 3 === 0;
+
+    const baseVoucher = {
       voucherNo: `VZF2A600${String(vNum).padStart(2, '0')}`,
       modelCode: `MDL-KL34-${String(20 + i).padStart(2, '0')}`,
       modelName: `Kalung Model ${String.fromCharCode(65 + (i % 26))} Lilin`,
@@ -906,9 +950,10 @@ export function getCompleteFactoryVouchers() {
       actualStage: 'CEL',
       plannedStage: isLate ? 'SOL' : 'CEL',
       plannedFinishHours: isLate ? '06-10 16:00' : '07-10 14:00',
-      condition: isLate ? 'OVERDUE' : (i % 3 === 0 ? 'ON TRACK' : 'ON PLAN'),
+      condition: isCompletedBatch ? 'ON PLAN' : (isLate ? 'OVERDUE' : 'ON TRACK'),
+      status: isCompletedBatch ? 'REALIZED' : 'SCHEDULED',
       delayHours: isLate ? parseFloat((10 + (i * 0.8)).toFixed(1)) : 0.0,
-      delayText: isLate ? `Terlambat ${(10 + (i * 0.8)).toFixed(1)} Jam` : (i % 3 === 0 ? 'On Track (Aman)' : 'Tepat Rencana'),
+      delayText: isLate ? `Terlambat ${(10 + (i * 0.8)).toFixed(1)} Jam` : 'Tepat Rencana',
       reason: isLate ? 'Antrean injeksi lilin padat' : 'Sedang proses pencetakan lilin',
       operator: 'Andi Saputra',
       machine: ['ML-01', 'ML-02', 'ML-03'][i % 3],
@@ -916,7 +961,9 @@ export function getCompleteFactoryVouchers() {
       realBiji: [40, 70, 140, 150][i % 4],
       planBeratGr: parseFloat((20 + (i * 1.5) % 30).toFixed(1)),
       realBeratGr: parseFloat((20 + (i * 1.5) % 30).toFixed(1))
-    });
+    };
+
+    generated.push(normalizeFactoryVoucher(baseVoucher));
   }
 
   // Fill SOL up to 41 vouchers
@@ -925,7 +972,9 @@ export function getCompleteFactoryVouchers() {
   for (let i = 1; i <= solNeeded; i++) {
     const vNum = 100 + i;
     const isLate = i % 3 === 0;
-    generated.push({
+    const isCompletedBatch = !isLate && i % 4 === 1;
+
+    const baseVoucher = {
       voucherNo: `VZF2A40${String(vNum).padStart(3, '0')}`,
       modelCode: `MDL-GL34-${String(30 + i).padStart(2, '0')}`,
       modelName: `Gelang Model ${String.fromCharCode(65 + (i % 26))} Lilin`,
@@ -936,9 +985,10 @@ export function getCompleteFactoryVouchers() {
       actualStage: 'SOL',
       plannedStage: isLate ? 'ST1' : 'SOL',
       plannedFinishHours: isLate ? '06-10 18:00' : '07-10 15:00',
-      condition: isLate ? 'OVERDUE' : (i % 2 === 0 ? 'ON TRACK' : 'ON PLAN'),
+      condition: isCompletedBatch ? 'ON PLAN' : (isLate ? 'OVERDUE' : 'ON TRACK'),
+      status: isCompletedBatch ? 'REALIZED' : 'SCHEDULED',
       delayHours: isLate ? parseFloat((8 + (i * 0.5)).toFixed(1)) : 0.0,
-      delayText: isLate ? `Terlambat ${(8 + (i * 0.5)).toFixed(1)} Jam` : (i % 2 === 0 ? 'On Track (Aman)' : 'Tepat Rencana'),
+      delayText: isLate ? `Terlambat ${(8 + (i * 0.5)).toFixed(1)} Jam` : 'Tepat Rencana',
       reason: isLate ? 'Antrean semprot perak lapisan 2' : 'Pengeringan perak konduktif',
       operator: 'Dwi Cahyono',
       machine: ['SOL-01', 'SOL-02'][i % 2],
@@ -946,37 +996,58 @@ export function getCompleteFactoryVouchers() {
       realBiji: [50, 70, 85, 100, 120][i % 5],
       planBeratGr: parseFloat((30 + (i * 1.8) % 40).toFixed(1)),
       realBeratGr: parseFloat((30 + (i * 1.8) % 40).toFixed(1))
-    });
+    };
+
+    generated.push(normalizeFactoryVoucher(baseVoucher));
   }
 
   return generated;
 }
 
-
-// Helper to calculate summary metrics
+// Helper to calculate summary metrics with strictly 2 indicators: Hijau (Terealisasi) & Kuning (Sedang Di-Schedule)
 export function calculateReportMetrics(vouchers = []) {
   const total = vouchers.length;
-  const overdueList = vouchers.filter(v => v.condition === 'OVERDUE');
-  const onPlanList = vouchers.filter(v => v.condition === 'ON PLAN');
-  const onTrackList = vouchers.filter(v => v.condition === 'ON TRACK');
+  
+  // 🟢 Hijau: Sudah Terealisasi
+  const realizedList = vouchers.filter(v => v.indicatorColor === 'green' || v.status === 'REALIZED');
+  
+  // 🟡 Kuning: Sedang Di-Schedule
+  const scheduledList = vouchers.filter(v => v.indicatorColor === 'yellow' || v.status === 'SCHEDULED' || !realizedList.includes(v));
+
+  // Di dalam yang Sedang Di-Schedule:
+  // - Melewati Target Planning (Seharusnya sudah selesai)
+  // - Dalam Target Normal (Sedang berjalan sesuai waktu)
+  const pastTargetList = scheduledList.filter(v => v.scheduleState === 'PAST_TARGET' || (v.delayHours && v.delayHours > 0));
+  const onTargetList = scheduledList.filter(v => !pastTargetList.includes(v));
 
   const totalPlanBiji = vouchers.reduce((sum, v) => sum + (v.planBiji || v.biji || 0), 0);
   const totalRealBiji = vouchers.reduce((sum, v) => sum + (v.realBiji || v.biji || 0), 0);
   const totalPlanBerat = vouchers.reduce((sum, v) => sum + (v.planBeratGr || v.beratTotalGr || 0), 0);
   const totalRealBerat = vouchers.reduce((sum, v) => sum + (v.realBeratGr || v.beratTotalGr || 0), 0);
 
-  const avgDelayHours = overdueList.length > 0 
-    ? (overdueList.reduce((sum, v) => sum + (v.delayHours || 0), 0) / overdueList.length).toFixed(1)
+  const avgDelayHours = pastTargetList.length > 0 
+    ? (pastTargetList.reduce((sum, v) => sum + (v.delayHours || 0), 0) / pastTargetList.length).toFixed(1)
     : '0.0';
 
   return {
     total,
-    overdueCount: overdueList.length,
-    overduePercent: total > 0 ? Math.round((overdueList.length / total) * 100) : 0,
-    onPlanCount: onPlanList.length,
-    onPlanPercent: total > 0 ? Math.round((onPlanList.length / total) * 100) : 0,
-    onTrackCount: onTrackList.length,
-    onTrackPercent: total > 0 ? Math.round((onTrackList.length / total) * 100) : 0,
+    // 🟢 Indikator Hijau
+    realizedCount: realizedList.length,
+    realizedPercent: total > 0 ? Math.round((realizedList.length / total) * 100) : 0,
+    // 🟡 Indikator Kuning
+    scheduledCount: scheduledList.length,
+    scheduledPercent: total > 0 ? Math.round((scheduledList.length / total) * 100) : 0,
+    // Sub-metrik Kuning (Mengetahui yang seharusnya selesai vs planning)
+    pastTargetCount: pastTargetList.length,
+    pastTargetPercent: scheduledList.length > 0 ? Math.round((pastTargetList.length / scheduledList.length) * 100) : 0,
+    onTargetCount: onTargetList.length,
+    // Legacy compatibility aliases
+    onPlanCount: realizedList.length,
+    onPlanPercent: total > 0 ? Math.round((realizedList.length / total) * 100) : 0,
+    overdueCount: pastTargetList.length,
+    overduePercent: total > 0 ? Math.round((pastTargetList.length / total) * 100) : 0,
+    onTrackCount: onTargetList.length,
+    onTrackPercent: total > 0 ? Math.round((onTargetList.length / total) * 100) : 0,
     totalPlanBiji,
     totalRealBiji,
     totalPlanBerat: totalPlanBerat.toFixed(1),
@@ -985,7 +1056,7 @@ export function calculateReportMetrics(vouchers = []) {
   };
 }
 
-// Function to export table data as CSV (Excel compatible)
+// Function to export table data as CSV (Excel compatible) with clean 2-indicator labels
 export function exportToCSV(vouchers, fileName = 'Laporan_Plan_vs_Real_Electroforming.csv') {
   const headers = [
     'No',
@@ -993,39 +1064,41 @@ export function exportToCSV(vouchers, fileName = 'Laporan_Plan_vs_Real_Electrofo
     'Kode Model',
     'Nama Produk',
     'Jalur',
-    'Qty Biji (Plan)',
     'Qty Biji (Real)',
-    'Berat Gram (Plan)',
     'Berat Gram (Real)',
     'Tahap Rencana (Plan)',
     'Tahap Riil (Real)',
-    'Kondisi Status',
-    'Keterangan Deviasi',
+    'Indikator Status',
+    'Kondisi Planning (Target vs Real)',
     'Jam Masuk Riil',
     'Target Selesai Rencana',
     'Operator / Tukang',
     'Mesin / Stasiun'
   ];
 
-  const rows = vouchers.map((v, idx) => [
-    idx + 1,
-    `"${v.voucherNo}"`,
-    `"${v.modelCode || '-'}"`,
-    `"${v.modelName || '-'}"`,
-    `"${v.materialType}"`,
-    v.planBiji || v.biji,
-    v.realBiji || v.biji,
-    v.planBeratGr || v.beratTotalGr,
-    v.realBeratGr || v.beratTotalGr,
-    `"${v.plannedStage || '-'}"`,
-    `"${v.actualStage || '-'}"`,
-    `"${v.condition}"`,
-    `"${v.delayText || '-'}"`,
-    `"${v.entryDate || '-'}"`,
-    `"${v.plannedFinishHours || '-'}"`,
-    `"${v.operator || '-'}"`,
-    `"${v.machine || '-'}"`
-  ]);
+  const rows = vouchers.map((v, idx) => {
+    const isGreen = v.indicatorColor === 'green' || v.status === 'REALIZED';
+    const statusText = isGreen ? 'Terealisasi (Hijau)' : 'Sedang Di-Schedule (Kuning)';
+    const planningText = v.timingText || (isGreen ? 'Selesai Tepat Waktu' : (v.delayHours > 0 ? `Seharusnya Selesai (Lewat ${v.delayHours} Jam)` : 'Dalam Target'));
+
+    return [
+      idx + 1,
+      `"${v.voucherNo}"`,
+      `"${v.modelCode || '-'}"`,
+      `"${v.modelName || '-'}"`,
+      `"${v.materialType}"`,
+      v.realBiji || v.biji,
+      v.realBeratGr || v.beratTotalGr,
+      `"${v.plannedStage || '-'}"`,
+      `"${v.actualStage || '-'}"`,
+      `"${statusText}"`,
+      `"${planningText}"`,
+      `"${v.entryDate || '-'}"`,
+      `"${v.plannedFinishHours || '-'}"`,
+      `"${v.operator || '-'}"`,
+      `"${v.machine || '-'}"`
+    ];
+  });
 
   const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

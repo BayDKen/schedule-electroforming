@@ -64,12 +64,11 @@
 
 ## 🎯 Fitur-Fitur Utama
 
-### 🚦 Klasifikasi Kondisi Plan vs Real
-| Status | Aksen Warna | Kriteria Logika |
+### 🚦 Dua Indikator Warna Plan vs Real
+| Status Indikator | Aksen Warna | Kriteria & Kondisi Planning |
 | :--- | :--- | :--- |
-| **OVERDUE** | 🔴 **Merah / Rose** | Voucher mengalami keterlambatan: tahap fisik tertinggal dari target jadwal shift, atau pengerjaan melebihi batas lead time standar. |
-| **ON PLAN** | 🟢 **Hijau / Emerald** | Voucher berada tepat di tahap yang direncanakan pada jam tersebut dan berjalan sesuai durasi standar. |
-| **ON TRACK** | 🔵 **Biru / Indigo** | Voucher sedang aktif diproses dalam batas toleransi normal dan diproyeksikan selesai tepat waktu. |
+| **Terealisasi** | 🟢 **Hijau / Emerald** | Voucher / proyek sudah selesai diproduksi sesuai rencana atau target subproses telah terpenuhi 100%. |
+| **Sedang Di-Schedule** | 🟡 **Kuning / Amber** | Voucher masih aktif berjalan di lini produksi / antrean mesin. Dibedakan otomatis: <br/>• **Dalam Target**: Waktu pengerjaan masih dalam estimasi jadwal rencana.<br/>• **Seharusnya Selesai**: Target jam planning telah terlewati namun fisik voucher belum selesai (tampil selisih waktu keterlambatan). |
 
 ### 🔄 Alur Pipeline Produksi
 1. **Jalur Lilin (12 Subproses)**:
